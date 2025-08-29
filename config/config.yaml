@@ -1,0 +1,251 @@
+# Recommended Dataset Configuration
+data:
+  solidifi_path: "./SolidiFI-benchmark"
+  contracts_path: "buggy_contracts"
+  results_path: "./SolidiFI-benchmark/results"
+  cache_dir: "cache"
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+  # Data augmentation
+  augment_minority_classes: true
+  augmentation_factor: 2.0
+  use_synthetic_edges: true
+  max_contracts_per_category: 1000  # Limit for memory efficiency 
+  use_cache: true 
+
+# Vulnerability type configuration
+vulnerability_types:
+  - "reentrancy"
+  - "integer_overflow" 
+  - "unchecked_return"
+  - "timestamp_dependency"
+  - "tx_origin"
+  - "unhandled_exception"
+  - "tod"
+
+processed_data_path: results  # or wherever your file is
+tools:
+  - manticore
+  - mythril
+  - oyente
+  - slither
+  - securify
+  - smartcheck
+
+
+
+# Improved Model Configuration 
+model:
+  hidden_dim: 128
+  num_layers: 4
+  num_heads: 4
+  dropout: 0.3
+  node_types: ["function", "statement", "expression", "variable"]
+  edge_types: ["control_flow", "data_flow", "call", "dependency"]
+  num_tools: 6
+  
+  # Architecture improvements
+  use_residual_connections: true
+  use_layer_norm: true
+  # use_batch_norm: true
+  use_batch_norm: false  # Use layer norm instead
+  use_skip_connections: true
+  use_graph_readout: "attention"  # Options: "mean", "max", "attention", "mean+max"
+  
+  # Enhanced features
+  # use_positional_encoding: true 
+  positional_encoding_dim: 32
+  
+  # Attention mechanism
+  attention_dropout: 0.2
+  attention_temperature: 1.0
+
+# Optimized Training Configuration
+training:
+  # batch_size: 8
+  # learning_rate: 0.0003  # Reduced for stability
+  # num_epochs: 200       # Reduced with early stopping
+  # early_stopping_patience: 25
+  # gradient_clip: 0.5
+  # weight_decay: 0.001 
+
+  batch_size: 4  # Reduced for stability
+  learning_rate: 0.0001  # Reduced for stability
+  num_epochs: 160  
+  early_stopping_patience: 15
+  gradient_clip: 1.0  # Increased for stability
+  weight_decay: 0.001
+  
+  # Learning rate scheduling
+  use_scheduler: true
+  # scheduler_type: "cosine_warmup"  # Options: "cosine_warmup", "reduce_on_plateau", "exponential" 
+  scheduler_type: "reduce_on_plateau"
+  warmup_epochs: 10
+  min_lr: 0.00001
+  scheduler_patience: 10
+  scheduler_factor: 0.7
+  
+  # Loss function improvements
+  use_smooth_l1_loss: true
+  use_focal_loss: true
+  focal_gamma: 2.0
+  
+  # Gradient accumulation for effective larger batch size
+  gradient_accumulation_steps: 2
+  
+  # Mixed precision training (if GPU available)
+  mixed_precision: true
+  
+  # Regularization
+  l2_regularization: 0.01
+  gradient_penalty: 0.001
+
+# Metric Weights (adjusted based on importance)
+metric_weights:
+  tpr: 1.5          # Important for detecting true vulnerabilities
+  fpr: 3.0          # Critical - we want low false positives
+  accuracy: 1.0     # Standard importance
+  precision: 1.5    # Important for tool reliability
+  recall: 1.5       # Same as TPR
+  f1_score: 2.0     # Balance of precision and recall
+
+# Tool Weights (based on evaluation results)
+tool_weights:
+  oyente: 1.0
+  securify: 2.5     # Needs more focus based on results
+  mythril: 1.2
+  smartcheck: 1.0
+  manticore: 1.1
+  slither: 1.3
+
+# Evaluation Configuration
+evaluation:
+  metrics: ["mse", "mae", "r2", "pearson_correlation", "f1_score", "confusion_matrix"]
+  save_predictions: true
+  generate_visualizations: true
+  use_cross_validation: false  # Set to true for more robust evaluation
+  n_folds: 5
+  
+  # Thresholds for binary classification interpretation
+  classification_threshold: 0.5
+  
+  # Confidence intervals
+  calculate_confidence_intervals: true
+  n_bootstrap: 1000
+  confidence_level: 0.95
+
+# Logging Configuration
+logging:
+  verbose: true
+  log_level: "INFO"  # Options: "DEBUG", "INFO", "WARNING", "ERROR"
+  log_predictions_sample: true
+  sample_size: 10 
+
+  # Performance metrics logging
+  log_confusion_matrices: true
+  log_per_contract_metrics: false  # Set to true for debugging
+  log_detection_details: false     # Set to true for detailed debugging
+  
+  # Weights & Biases
+  wandb_project: "heterotoolgnn-enhanced"
+  wandb_tags: ["tool-performance", "f1-score", "enhanced-architecture"]
+  
+  # Checkpointing
+  checkpoint_frequency: 10
+  save_best_only: false
+  save_top_k: 3
+  
+  # Tensorboard
+  use_tensorboard: true
+  tensorboard_dir: "runs"
+
+# Advanced Features
+advanced:
+  # Graph construction
+  # max_edges_per_type: 500
+  # min_edge_weight: 0.1
+  # node_feature_dim: 32
+  # contract_feature_dim: 64
+  # use_edge_features: true
+  # edge_feature_dim: 16 
+
+  max_edges_per_type: 500
+  min_edge_weight: 0.1
+  node_feature_dim: 21
+  contract_feature_dim: 32
+  use_edge_features: true
+  edge_feature_dim: 16
+  
+  # Node sampling for large graphs
+  use_node_sampling: true
+  max_nodes_per_type: 1000
+  sampling_strategy: "importance"  # Options: "random", "importance", "degree"
+  
+  # Data preprocessing
+  normalize_features: true
+  use_feature_selection: true
+  feature_selection_threshold: 0.95  # Variance threshold
+  
+  # Model improvements
+  use_graph_transformer: false  # Experimental
+  use_hierarchical_pooling: true
+  pooling_ratio: 0.8
+  
+  # Training stability
+  gradient_accumulation_steps: 2
+  mixed_precision: true
+  enable_gradient_anomaly_detection: false  # Set to true for debugging
+  
+  # Memory optimization
+  empty_cache_frequency: 50  # Empty GPU cache every N batches
+  use_cpu_offload: false     # Offload some computations to CPU
+  
+  # Ensemble settings (future enhancement)
+  use_ensemble: false
+  ensemble_size: 3
+  ensemble_strategy: "average"  # Options: "average", "weighted", "voting"
+
+# Optimization suggestions based on hardware
+hardware_optimization:
+  # For GPU with limited memory (< 8GB)
+  small_gpu:
+    batch_size: 4
+    hidden_dim: 64
+    gradient_accumulation_steps: 4
+    mixed_precision: true
+    
+  # For GPU with good memory (8-16GB)
+  medium_gpu:
+    batch_size: 8
+    hidden_dim: 128
+    gradient_accumulation_steps: 2
+    mixed_precision: true
+    
+  # For GPU with large memory (> 16GB)
+  large_gpu:
+    batch_size: 16
+    hidden_dim: 256
+    gradient_accumulation_steps: 1
+    mixed_precision: true
+    
+  # For CPU only
+  cpu_only:
+    batch_size: 2
+    hidden_dim: 64
+    num_workers: 4
+    mixed_precision: false
+
+# Experiment tracking
+experiment:
+  name: "enhanced_tool_performance"
+  description: "HeteroToolGNN with F1 score tracking and architectural improvements"
+  tags: ["f1-score", "enhanced", "shape-fix", "visualization"]
+  
+  # Hyperparameter search space (for future optimization)
+  hyperparameter_search:
+    learning_rate: [0.0001, 0.0003, 0.0005, 0.001]
+    hidden_dim: [64, 128, 256]
+    num_layers: [3, 4, 5]
+    dropout: [0.2, 0.3, 0.4]
+    batch_size: [4, 8, 16]

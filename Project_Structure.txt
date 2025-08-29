@@ -1,0 +1,40 @@
+HeteroVulnGNN/
+├── README.md
+├── requirements.txt
+├── setup.py 
+├── analysis/
+│   ├── __init__.py
+│   └── fp_fn_analyzer.py
+├── config/
+│   ├── __init__.py
+│   └── config.yaml
+├── data/
+│   ├── __init__.py
+│   ├── loader.py
+│   ├── processor.py
+│   └── graph_builder.py
+├── models/
+│   ├── __init__.py
+│   ├── heterognn.py
+│   ├── layers.py
+│   └── losses.py
+├── SolidiFI-benchmark/
+├── utils/
+│   ├── __init__.py
+│   ├── metrics.py
+│   ├── visualization.py
+│   └── helpers.py
+├── experiments/
+│   ├── __init__.py
+│   ├── train.py
+│   ├── evaluate.py
+│   └── analyze_results.py
+├── notebooks/
+│   ├── data_exploration.ipynb
+│   └── model_analysis.ipynb
+└── tests/
+|   ├── __init__.py
+|   ├── test_data.py
+|   ├── test_model.py
+|   └── test_metrics.py 
+└── generate_fp_fn_analysis.py

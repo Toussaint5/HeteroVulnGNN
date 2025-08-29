@@ -1,0 +1,87 @@
+Quick Start
+1. Data Preparation
+Download the SolidiFI benchmark: git clone https://github.com/DependableSystemsLab/SolidiFI-benchmark.git
+
+
+2. Configuration
+Edit config/config.yaml to point to your data:
+data:
+  solidifi_path: "/path/to/SolidiFI-benchmark"
+  # ... other configurations
+
+
+3. Training
+python experiments/train.py --config config/config.yaml 
+
+
+4. Evaluation
+python experiments/evaluate.py --config config/config.yaml --checkpoint checkpoints/best_model.pt 
+
+
+
+################################
+
+# Download the SolidiFI benchmark
+git clone https://github.com/DependableSystemsLab/SolidiFI-benchmark.git
+
+# Create config file with correct paths
+mkdir -p config
+cat > config/config.yaml << 'EOF'
+# Dataset Configuration
+data:
+  solidifi_path: "./SolidiFI-benchmark"
+  contracts_path: "contracts"
+  results_path: "results"
+  cache_dir: "cache"
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+
+# Model Configuration
+model:
+  hidden_dim: 256
+  num_layers: 4
+  num_heads: 8
+  dropout: 0.1
+  node_types: ["function", "statement", "expression", "variable"]
+  edge_types: ["control_flow", "data_flow", "call", "dependency"]
+  vulnerability_types: 7
+  num_tools: 6
+
+# Training Configuration
+training:
+  batch_size: 8
+  learning_rate: 0.001
+  num_epochs: 100
+  early_stopping_patience: 10
+  gradient_clip: 1.0
+  weight_decay: 0.0001
+
+# Task Weights
+task_weights:
+  vulnerability_detection: 1.0
+  tool_performance: 0.5
+  injection_optimization: 0.3
+
+# Evaluation
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1", "auc"]
+  save_predictions: true
+  generate_visualizations: true
+EOF
+
+# Create necessary directories
+mkdir -p checkpoints results cache
+
+echo "✓ Setup complete! You can now run:"
+echo "  python experiment
+
+
+
+##################TO RUN
+python experiments/train.py --config config/config.yaml 
+
+
+
+################TO EVALUATE
+python experiments/evaluate.py --config config/config.yaml --checkpoint checkpoints/best_model.pt
